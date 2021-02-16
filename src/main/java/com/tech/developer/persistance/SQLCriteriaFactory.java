@@ -23,7 +23,7 @@ public interface SQLCriteriaFactory {
 	}
 
 	public static Supplier<String> deleteAllPin() {
-		return () -> "DELETE FROM pin";
+		return () -> "DELETE FROM pin where pin.id > 0";
 	}
 
 	public static Supplier<String> updatePin() {

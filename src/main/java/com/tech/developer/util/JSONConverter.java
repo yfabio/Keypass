@@ -30,11 +30,8 @@ public class JSONConverter {
 		
 		jo.add("id", new JsonPrimitive(pin.getId()));
 		jo.add("title", new JsonPrimitive(pin.getTitle()));
-		jo.add("username", new JsonPrimitive(pin.getUsername()));
-		
-		String encrypted = cryptoUtilCallback.encryptValue(pin.getPassword());
-		jo.add("password", new JsonPrimitive(encrypted));
-		
+		jo.add("username", new JsonPrimitive(pin.getUsername()));		
+		jo.add("password", new JsonPrimitive(pin.getPassword()));		
 		jo.add("link",new JsonPrimitive(pin.getLink()));
 		jo.add("notes", new JsonPrimitive(pin.getNotes()));
 		jo.add("person_id", new JsonPrimitive(pin.getPerson().getId()));
@@ -56,6 +53,7 @@ public class JSONConverter {
 		pin.setUsername(holder.username);
 						
 		String decrypted = cryptoUtilCallback.decryptValue(holder.password);
+		
 		pin.setPassword(decrypted);				
 		
 		pin.setLink(holder.link);

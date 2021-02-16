@@ -5,6 +5,7 @@ import static com.tech.developer.util.Strings.getBundleValue;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListResourceBundle;
 import java.util.concurrent.Callable;
@@ -312,18 +313,44 @@ public class ControllerMain implements Serializable, StageAwareController, Reloa
 	}
 
 	private void deleteAndInsert(List<Pin> newer) {
-		new Thread(() -> {
-			try {
-				pindao.execute(SQLCriteriaFactory.deleteAllPin().get());
-				for (Pin pin : newer) {
-					pindao.insert(pin);
+		
+		ExecutorService ex = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());		
+	    List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
+	    	    	    
+	    try {
+	    	
+	    	Callable<Void> taskDelete = () -> {
+		    	pindao.execute(SQLCriteriaFactory.deleteAllPin().get());
+				return null;	    	
+		    };
+		    		    
+		    Callable<Void> taskInsert = () -> {
+		    	for (Pin pin : newer) {
+		    		pindao.insert(pin);
 				}
-				reload();
-			} catch (PersistanceException e) {
-				DialogManager.dialogError(getBundleValue("alert-main-title"), getBundleValue("alert-head-error"),
-						e.getMessage());
-			}
-		}).start();
+				return null;	    	
+		    };
+			
+		    Callable<Void> taskReload =  () -> {
+		    	reload();
+		    	return null;
+		    };
+			
+		    tasks.add(taskDelete);
+		    tasks.add(taskInsert);
+		    tasks.add(taskReload);
+		    
+		    ex.invokeAll(tasks);
+		    ex.shutdown();
+			
+		} catch (Exception e) {
+			Platform.runLater(() -> {
+				DialogManager.dialogError(getBundleValue("alert-main-title"), getBundleValue("alert-head-error"),e.getMessage());
+			});
+		}
+	    
+		
+		
 	}
 
 	@FXML

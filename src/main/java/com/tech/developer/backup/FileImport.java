@@ -51,15 +51,15 @@ public class FileImport extends FileTaskImported<List<Pin>> {
 			
 			List<String> lines = Files.readAllLines(dir);
 			
+			
 			for (int i = 0; i < lines.size(); i++) {
 				
 				String line = lines.get(i);
 				
 				Pin pin = JSONConverter.convertStringAsPin(line, cryptoUtilCallback);
-				
-				
+								
 				pins.add(pin);
-									
+							
 				Thread.sleep(10);
 				
 			}
